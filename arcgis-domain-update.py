@@ -8,13 +8,13 @@ import csv
 csv_path = 'path/to/your/csv.csv'
 with open(csv_path) as csvfile:
     reader = csv.reader(csvfile)
-    next(reader)  # Skip the header
+    next(reader) 
     coded_values = [{'name': row[0], 'code': int(row[1])} for row in reader]
 
 # Setup your GIS connection
 gis = GIS("your_gis_url_here","your_username","your_password")
 
-# Example: updating a single geodatabase item
+# Updating a single geodatabase item
 item_id = "your_item_id_here" #https://community.esri.com/t5/arcgis-online-blog/where-can-i-find-the-item-id-for-an-arcgis-online/ba-p/890284
 item = gis.content.get(item_id)
 
