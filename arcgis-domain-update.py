@@ -3,27 +3,52 @@ import arcgis
 from arcgis.gis import GIS
 from arcgis.features import FeatureLayer
 import csv
+import time
 
-# Path to your CSV file containing domain values
-csv_path = 'path/to/your/csv.csv'
+#Path to your domain CSV
+csv_path = r"path_to_your_domain_csv.csv"
 with open(csv_path) as csvfile:
     reader = csv.reader(csvfile)
-    next(reader) 
+    next(reader)  # Skip the header row
     coded_values = [{'name': row[0], 'code': int(row[1])} for row in reader]
+print(coded_values[-1])
 
-# Setup your GIS connection
-gis = GIS("your_gis_url_here","your_username","your_password")
+# Connect to the GIS
+gis = GIS("your_gis_url", "your_username", "your_password")
 
-# Updating a single geodatabase item
-item_id = "your_item_id_here" #https://community.esri.com/t5/arcgis-online-blog/where-can-i-find-the-item-id-for-an-arcgis-online/ba-p/890284
-item = gis.content.get(item_id)
+# Get item URL for the modeling gdb
+item_id_modeling = "item_id_for_modeling_gdb"
+item = gis.content.get(item_id_modeling)
 
-# Update each feature layer in the item
-for i in range(number_of_layers):
-    feature_layer = FeatureLayer(item.url + "/" + str(i))
-    feature_layer.manager.update_definition({
-        'fields': [{'name': 'your_field_name',
-                    'domain': {'type': 'codedValue', 'name': 'your_field_name', 'codedValues': coded_values}}]
+for i in range(6):  # range = number of layers
+    feature_layer_url = item.url + "/" + str(i)
+    feature_layer = FeatureLayer(feature_layer_url)
+    service_url = feature_layer.url
+
+    url = service_url
+    field_name = 'field_name_for_model_id'
+
+    fl = arcgis.features.FeatureLayer(url, gis)
+    fl.manager.update_definition({
+        'fields': [{'name': field_name, 'domain': {'type': 'codedValue', 'name': field_name, 'codedValues': coded_values}}]
     })
 
-print("Update complete, grab a cold beer!")
+    print(f"Layer {i} modeling done")
+
+item_id_mpo = "item_id_for_mpo_gdb"
+item = gis.content.get(item_id_mpo)
+
+for i in range(6):  # range = number of layers
+    feature_layer_url = item.url + "/" + str(i)
+    feature_layer = FeatureLayer(feature_layer_url)
+    service_url = feature_layer.url
+
+    url = service_url
+    field_name = 'field_name_for_kod_hdm'
+
+    fl = arcgis.features.FeatureLayer(url, gis)
+    fl.manager.update_definition({
+        'fields': [{'name': field_name, 'domain': {'type': 'codedValue', 'name': field_name, 'codedValues': coded_values}}]
+    })
+
+    print(f"Layer {i} MPO done")
